@@ -1,0 +1,38 @@
+//
+/* 
+var formatter =
+// */
+{
+    /** 总线模块 */
+    bus : {
+        test : {
+
+        }
+    },
+    /** 插件模块（WorkflowPlugin，LuaPlugin） */
+    plugin : {
+        test : {
+            class : "net.isger.brick.test.TestPlugin",
+            services : [ {
+                path : "net.isger.brick.test.service",
+                bus : "test"
+            } ],
+            persists : [ {
+                path : "net.isger.brick.test.persist",
+                stub : "test"
+            } ]
+        }
+    },
+    /** 存根模块 */
+    stub : {
+        test : {
+            class : "net.isger.brick.test.TestStub",
+            parameters : {
+                driverName : "oracle.jdbc.driver.OracleDriver",
+                url : "jdbc:oracle:thin:@192.168.2.18:1521:orcl",
+                user : "excenter",
+                password : "sunshine"
+            }
+        }
+    }
+}
