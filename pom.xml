@@ -34,8 +34,8 @@
     <!-- JDBC依赖 -->
     <dependency>
       <groupId>jdbc</groupId>
-      <artifactId>oracle</artifactId>
-      <version>11.2.0.1.0</version>
+      <artifactId>mysql</artifactId>
+      <version>3.0.10</version>
     </dependency>
     <!-- 砖头依赖 -->
     <dependency>

@@ -28,10 +28,10 @@ var formatter =
         test : {
             class : "net.isger.brick.test.TestStub",
             parameters : {
-                driverName : "oracle.jdbc.driver.OracleDriver",
-                url : "jdbc:oracle:thin:@192.168.2.18:1521:orcl",
-                user : "excenter",
-                password : "sunshine"
+                driverName : "com.mysql.jdbc.Driver",
+                url : "jdbc:mysql://localhost/leo",
+                user : "root",
+                password : "root"
             }
         }
     }

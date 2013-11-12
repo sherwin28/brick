@@ -26,9 +26,26 @@ public class BrickTest extends TestCase {
         pcmd.setParameter("test", "this is test.");
         Console.execute(pcmd);
         StubCommand scmd = StubCommand.cast(pcmd);
-        scmd.setTable(new TestBean());
+        TestBean bean = new TestBean();
+        bean.setId("test");
+        bean.setName("hello");
+        scmd.setTable(bean);
+        // scmd.setOperate(StubCommand.OPERATE_INSERT);
+        // Console.execute(scmd);
         scmd.setOperate(StubCommand.OPERATE_SEARCH);
-        System.out.println(Console.execute(scmd));
+        Object[] result = (Object[]) Console.execute(scmd);
+        System.out.println("======================================");
+        for (Object name : (Object[]) result[0]) {
+            System.out.print(name + "\t\t");
+        }
+        System.out.println();
+        System.out.println("--------------------------------------");
+        for (Object[] row : (Object[][]) result[1]) {
+            for (Object cell : row) {
+                System.out.print(cell + "\t\t");
+            }
+            System.out.println();
+        }
         assertTrue(true);
     }
 
