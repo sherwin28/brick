@@ -31,8 +31,9 @@ public class PluginModule extends AbstractModule {
 
     static {
         LOG = LoggerFactory.getLogger(PluginModule.class);
-        Converter.register(ServicesConversion.CONVERSION);
-        Converter.register(PersistsConversion.CONVERSION);
+        Converter converter = Converter.getConverter();
+        converter.add(ServicesConversion.CONVERSION);
+        converter.add(PersistsConversion.CONVERSION);
     }
 
     private Map<String, Plugin> plugins;

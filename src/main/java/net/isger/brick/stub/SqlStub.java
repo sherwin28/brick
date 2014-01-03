@@ -6,6 +6,10 @@ import java.sql.SQLException;
 import java.util.Map;
 
 import net.isger.brick.BrickException;
+import net.isger.brick.stub.dialect.Dialect;
+import net.isger.brick.stub.dialect.Page;
+import net.isger.brick.stub.dialect.PageSQL;
+import net.isger.brick.stub.dialect.Sort;
 import net.isger.brick.util.Sqls;
 import net.isger.brick.util.Sqls.SQLEntry;
 
@@ -19,6 +23,8 @@ public class SqlStub extends AbstractStub {
 
     public static final String PARAM_PASSWORD = "password";
 
+    private Dialect dialect;
+
     public void initial() {
         super.initial();
         String driverName = null;
@@ -27,6 +33,14 @@ public class SqlStub extends AbstractStub {
         } catch (ClassNotFoundException e) {
             throw new BrickException("Invalid driver " + driverName);
         }
+        dialect = getDialect(driverName);
+        if (dialect == null) {
+            throw new BrickException("Unsupport driver " + driverName);
+        }
+    }
+
+    protected Dialect getDialect(String driverName) {
+        return Dialects.getDialect(driverName);
     }
 
     protected String getDriverName() {
@@ -141,91 +155,73 @@ public class SqlStub extends AbstractStub {
     @SuppressWarnings("unchecked")
     public void search() {
         StubCommand cmd = StubCommand.getAction();
-        Object result = null;
         Object table = cmd.getTable();
-        Object config = cmd.getCondition();
+        SearchCondition condition = getSearchCondition(cmd.getCondition());
         Connection conn = getConnection();
-        SQLEntry sql = null;
         try {
+            String sql;
+            Object[] values;
             if (table instanceof String) {
-                Object[] condition = (Object[]) config;
-                sql = Sqls.getQueryEntry((String) table,
-                        (Map<String, Object>) condition[3]);
-                result = search(conn, sql.getSQL(), sql.getValues(),
-                        getStart(condition), getLimit(condition),
-                        getTotal(condition));
+                SQLEntry entry = Sqls.getQueryEntry((String) table,
+                        (Map<String, Object>) condition.getValues());
+                sql = entry.getSQL();
+                values = entry.getValues();
             } else if (table instanceof Class) {
-                Object[] condition = (Object[]) config;
-                String target = (String) condition[4];
-                if (target == null) {
-                    target = StubCommand.OPERATE_SEARCH;
-                }
-                result = search(conn,
-                        Sqls.getSQL((Class<?>) table, target, condition[5]),
-                        (Object[]) condition[3], getStart(condition),
-                        getLimit(condition), getTotal(condition));
+                sql = Sqls.getSQL((Class<?>) table, condition.getTarget(),
+                        condition.getArgments());
+                values = (Object[]) condition.getValues();
 
             } else {
-                Object[] condition = (Object[]) config;
-                sql = Sqls.getQueryEntry(table);
-                result = search(conn, sql.getSQL(), sql.getValues(),
-                        getStart(condition), getLimit(condition),
-                        getTotal(condition));
+                SQLEntry entry = Sqls.getQueryEntry(table);
+                sql = entry.getSQL();
+                values = entry.getValues();
             }
+            cmd.setResult(search(conn, sql, values, condition.getPage(),
+                    condition.getSort()));
         } finally {
             close(conn);
         }
-        cmd.setResult(result);
+    }
+
+    private SearchCondition getSearchCondition(Object config) {
+        if (config instanceof SearchCondition) {
+            return (SearchCondition) config;
+        }
+        SearchCondition condition = new SearchCondition();
+        if (config != null) {
+            Object[] searchConfig = new Object[5];
+            System.arraycopy(config, 0, searchConfig, 0, 5);
+            condition.setPage((Page) searchConfig[0]);
+            condition.setSort((Sort) searchConfig[1]);
+            condition.setValues(searchConfig[2]);
+            condition.setTarget((String) searchConfig[3]);
+            condition.setArgments((Object[]) searchConfig[4]);
+        }
+        return condition;
     }
 
     private Object search(Connection conn, String sql, Object[] values,
-            Integer start, Integer limit, Integer total) {
+            Page page, Sort sort) {
         Object[] result = null;
-        if (start == null || limit == null) {
+        sql = dialect.makeSortSQL(sql, sort);
+        if (page == null) {
             result = Sqls.query(sql, values, conn);
         } else {
-            // TODO 缺省ORACLE本地化分页
-            String pageSQL = "select * from (select t1.*, rownum rn from ("
-                    + sql + ") t1 where rownum <= ?) t2 where rn > ?";
-            Object[] pageValues = null;
-            int valCount = 2;
-            if (values != null) {
-                valCount += values.length;
-                pageValues = new Object[valCount];
-                System.arraycopy(values, 0, pageValues, 0, values.length);
-            } else {
-                pageValues = new Object[valCount];
-            }
-            pageValues[valCount - 1] = start;
-            pageValues[valCount - 2] = start + limit;
-            Object[] datas = Sqls.query(pageSQL, pageValues, conn);
-            if (total == null) {
+            PageSQL pageSQL = dialect.makePageSQL(sql, values, page);
+            Object[] datas = Sqls.query(pageSQL.getWrapSQL(),
+                    pageSQL.getWrapValues(), conn);
+            if (page.getTotal() == null) {
                 // 查询总数
                 result = new Object[3];
                 result[0] = datas[0];
                 result[1] = datas[1];
-                result[2] = ((Object[][]) Sqls.query("select count(*) from ("
-                        + sql + ") t", values, conn)[1])[0][0];
+                result[2] = ((Object[][]) Sqls.query(pageSQL.getCountSQL(),
+                        values, conn)[1])[0][0];
             } else {
                 result = datas;
             }
         }
         return result;
-    }
-
-    private Integer getStart(Object[] condition) {
-        return (Integer) (condition != null && condition.length > 0 ? condition[0]
-                : null);
-    }
-
-    private Integer getLimit(Object[] condition) {
-        return (Integer) (condition != null && condition.length > 0 ? condition[0]
-                : null);
-    }
-
-    private Integer getTotal(Object[] condition) {
-        return (Integer) (condition != null && condition.length > 0 ? condition[0]
-                : null);
     }
 
     private void close(Connection conn) {

@@ -4,6 +4,8 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import net.isger.brick.core.Console;
+import net.isger.brick.core.ConsoleManager;
+import net.isger.brick.core.Context;
 import net.isger.brick.plugin.PluginCommand;
 import net.isger.brick.stub.StubCommand;
 import net.isger.brick.test.bean.TestBean;
@@ -24,7 +26,13 @@ public class BrickTest extends TestCase {
         pcmd.setDirect("test");
         pcmd.setTarget("test");
         pcmd.setParameter("test", "this is test.");
-        Console.execute(pcmd);
+        ConsoleManager manager = new ConsoleManager();
+        Console console = manager.getConsole();
+        Context context = new Context();
+        context.set(Context.COMMAND, pcmd);
+        Context.setContext(context);
+        console.execute();
+        // OldConsole.execute(pcmd);
         StubCommand scmd = StubCommand.cast(pcmd);
         TestBean bean = new TestBean();
         bean.setId("test");
@@ -33,7 +41,10 @@ public class BrickTest extends TestCase {
         // scmd.setOperate(StubCommand.OPERATE_INSERT);
         // Console.execute(scmd);
         scmd.setOperate(StubCommand.OPERATE_SEARCH);
-        Object[] result = (Object[]) Console.execute(scmd);
+        // Object[] result = (Object[]) Console.execute(scmd);
+        context.set(Context.COMMAND, scmd);
+        console.execute();
+        Object[] result = (Object[]) scmd.getResult();
         System.out.println("======================================");
         for (Object name : (Object[]) result[0]) {
             System.out.print(name + "\t\t");

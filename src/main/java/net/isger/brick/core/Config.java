@@ -49,27 +49,27 @@ public class Config {
         Artifact artifact = Depository.wrap("json", Depot.LAB_FILE,
                 CONF_FILE_CORE);
         if (artifact == null) {
-            return new Console();
+            return new OldConsole();
         }
         // 检查控制台配置
         Object res = artifact.use("transform");
         if (!(res instanceof Map)) {
             LOG.warn("Unexpected setup the console by {}" + res);
-            return new Console();
+            return new OldConsole();
         }
         Map<String, Object> configMap = (Map<String, Object>) res;
         // 生成控制台实例
-        Console console;
+        OldConsole console;
         res = configMap.get(CONF_CONSOLE);
         if (res == null) {
-            console = new Console();
+            console = new OldConsole();
         } else {
             res = SimpleLoader.load(res, Console.class);
             if (!(res instanceof Console)) {
                 throw new BrickException("Unexpected setup the console by "
                         + res);
             }
-            console = (Console) res;
+            console = (OldConsole) res;
         }
         // 检查模块配置
         res = configMap.get(CONF_MODULES);
@@ -100,8 +100,8 @@ public class Config {
      */
     @SuppressWarnings("unchecked")
     public static void load(String path) {
-        Console console = Console.getActionConsole();
-        console.shutdown();
+        OldConsole console = OldConsole.getActionConsole();
+        console.destroy();
         // 加载应用配置
         Artifact artifact = Depository.wrap("json", Depot.LAB_FILE, path);
         if (artifact == null) {
@@ -115,7 +115,7 @@ public class Config {
         } else {
             throw new BrickException("Unexpected load the modules by " + res);
         }
-        console.startup();
+        console.initial();
     }
 
     /**
@@ -150,7 +150,7 @@ public class Config {
      * @param res
      */
     private static void load(Map<String, Object> res) {
-        Console console = Console.getActionConsole();
+        OldConsole console = OldConsole.getActionConsole();
         Modules modules = console.getModules();
         Module module;
         String name;

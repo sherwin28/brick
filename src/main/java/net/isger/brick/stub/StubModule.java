@@ -35,6 +35,7 @@ public class StubModule extends AbstractModule {
     public StubModule() {
         this.stubs = new HashMap<String, Stub>();
         this.loader = new SimpleLoader(SqlStub.class) {
+
             @SuppressWarnings("unchecked")
             protected Object load(Map<String, Object> res) {
                 List<Object> result = new ArrayList<Object>();

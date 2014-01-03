@@ -29,7 +29,7 @@ var formatter =
             class : "net.isger.brick.test.TestStub",
             parameters : {
                 driverName : "com.mysql.jdbc.Driver",
-                url : "jdbc:mysql://localhost/leo",
+                url : "jdbc:mysql://localhost/isoftinn",
                 user : "root",
                 password : "root"
             }

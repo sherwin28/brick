@@ -7,6 +7,7 @@ import java.util.Map;
 import net.isger.brick.BrickConstants;
 import net.isger.brick.plugin.PluginModule;
 import net.isger.brick.stub.StubModule;
+import net.isger.brick.util.anno.Ignore;
 import net.isger.brick.util.hitcher.Director;
 
 import org.slf4j.Logger;
@@ -18,6 +19,7 @@ import org.slf4j.LoggerFactory;
  * @author issing
  * 
  */
+@Ignore
 public final class Modules extends Director implements Iterable<Module> {
 
     private static final String KEY_MODULES = "brick.core.modules";
@@ -32,7 +34,7 @@ public final class Modules extends Director implements Iterable<Module> {
         LOG = LoggerFactory.getLogger(Modules.class);
     }
 
-    Modules() {
+    public Modules() {
         modules = new HashMap<String, Module>();
         add(BrickConstants.MODULE_PLUGIN, new PluginModule());
         add(BrickConstants.MODULE_STUB, new StubModule());
@@ -53,9 +55,9 @@ public final class Modules extends Director implements Iterable<Module> {
     public void add(String name, Module module) {
         Module oldModule = modules.put(name, module);
         if (oldModule == null) {
-            LOG.info("Binded the module [{}] with {}", name, module);
+            LOG.info("Binded the module ({}) for ({})", name, module);
         } else {
-            LOG.info("Multiple binded the module [{}] with {}", name, module);
+            LOG.info("Multiple binded the module ({}) with ({})", name, module);
         }
     }
 
@@ -97,4 +99,5 @@ public final class Modules extends Director implements Iterable<Module> {
         }
         modules.clear();
     }
+
 }

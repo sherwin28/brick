@@ -8,9 +8,9 @@ import java.util.Map;
 import net.isger.brick.BrickException;
 import net.isger.brick.util.Reflects;
 import net.isger.brick.util.SimpleLoader;
-import net.isger.brick.util.hitcher.Scanner;
-import net.isger.brick.util.hitcher.scan.ScanFilter;
 import net.isger.brick.util.reflect.Conversion;
+import net.isger.brick.util.scanner.Scanner;
+import net.isger.brick.util.scanner.scan.ScanFilter;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

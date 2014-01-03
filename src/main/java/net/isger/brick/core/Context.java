@@ -29,7 +29,11 @@ public class Context {
         actionContext = new ThreadLocal<Context>();
     }
 
-    protected Context(Map<String, Object> context) {
+    public Context() {
+        this(null);
+    }
+
+    public Context(Map<String, Object> context) {
         this.context = new HashMap<String, Object>();
         if (context != null) {
             this.context.putAll(context);

@@ -19,7 +19,7 @@ import net.isger.brick.util.reflect.Converter;
  */
 public class SimpleLoader implements Loader {
 
-    public static final String CLASS = "class";
+    private static final String CLASS = "class";
 
     protected Class<?> targetClass;
 

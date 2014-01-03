@@ -13,7 +13,7 @@ public class CommandShell implements Command {
     }
 
     protected CommandShell(Command cmd) {
-        this.cmd = cmd == null ? new BaseCommand() : cmd;
+        this.cmd = cmd == null ? new DefaultCommand() : cmd;
     }
 
     public String getModuleName() {

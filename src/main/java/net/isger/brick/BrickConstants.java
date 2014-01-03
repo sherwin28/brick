@@ -1,12 +1,22 @@
 package net.isger.brick;
 
 /**
- * 键信息
+ * 常量信息
  * 
  * @author issing
  * 
  */
 public interface BrickConstants {
+
+    public static final String KEY_BRICK_CONSOLEMANAGER = "brick.consoleManager";
+
+    public static final String KEY_BRICK_NAME = "brick.name";
+
+    public static final String BRICK = "brick";
+
+    public static final String KEY_BRICK_CONTAINER = "brick.container";
+
+    public static final String KEY_ENABLED_RELOAD = "enable.reload";
 
     public static final String MODULE_AUTH = "auth";
 
