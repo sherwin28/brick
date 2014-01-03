@@ -9,18 +9,18 @@ package net.isger.brick.core;
 public interface Module {
 
     /**
-     * 初始
-     * 
-     */
-    public void initial();
-
-    /**
      * 加载
      * 
      * @param res
      * @return
      */
     public void load(Object res);
+
+    /**
+     * 初始
+     * 
+     */
+    public void initial();
 
     /**
      * 执行

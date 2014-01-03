@@ -20,7 +20,7 @@ public class OperatersConversion implements Conversion {
     @SuppressWarnings("unchecked")
     public Object convert(Object value) {
         if (value instanceof Map) {
-            // 存在缺陷
+            // TODO 存在缺陷
             Operaters operaters = new Operaters(null);
             Object config;
             for (Entry<String, Object> entry : ((Map<String, Object>) value)

@@ -9,6 +9,14 @@ public class TestBean {
 
     private String name;
 
+    public TestBean() {
+    }
+
+    public TestBean(String id, String name) {
+        this.id = id;
+        this.name = name;
+    }
+
     public String getId() {
         return id;
     }

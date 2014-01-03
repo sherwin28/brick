@@ -30,6 +30,13 @@ public interface Console {
     public void execute();
 
     /**
+     * 执行
+     * 
+     * @param cmd
+     */
+    public void execute(Command cmd);
+
+    /**
      * 注销
      * 
      */

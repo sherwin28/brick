@@ -9,6 +9,12 @@ import net.isger.brick.util.hitcher.Director;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 作用域集合
+ * 
+ * @author issing
+ * 
+ */
 public class ScopeStrategies extends Director {
 
     private static final String KEY_STRATEGIES = "brick.core.inject.strategies";
@@ -17,14 +23,14 @@ public class ScopeStrategies extends Director {
 
     private static final Logger LOG;
 
-    private Map<Key<?>, Strategy> strategies;
+    private Map<Key<?>, Strategy> stgs;
 
     static {
         LOG = LoggerFactory.getLogger(ScopeStrategies.class);
     }
 
     public ScopeStrategies() {
-        strategies = new HashMap<Key<?>, Strategy>();
+        stgs = new HashMap<Key<?>, Strategy>();
         canonicalize(this);
     }
 
@@ -40,7 +46,7 @@ public class ScopeStrategies extends Director {
      */
     public void add(Class<?> type, String name, Strategy strategy) {
         Key<?> key = Key.newInstance(type, name);
-        Strategy oldStrategy = strategies.put(key, strategy);
+        Strategy oldStrategy = stgs.put(key, strategy);
         if (oldStrategy == null) {
             LOG.info("Binded the strategy [{}] with {}", name, strategy);
         } else {
@@ -56,7 +62,7 @@ public class ScopeStrategies extends Director {
      * @return
      */
     public Strategy get(Class<?> type) {
-        return strategies.get(Key.newInstance(type, Container.DEFAULT_NAME));
+        return stgs.get(Key.newInstance(type, Container.DEFAULT_NAME));
     }
 
     /**
@@ -66,7 +72,16 @@ public class ScopeStrategies extends Director {
      * @return
      */
     public Strategy get(Class<?> type, String name) {
-        return strategies.get(Key.newInstance(type, name));
+        return stgs.get(Key.newInstance(type, name));
+    }
+
+    /**
+     * 获取策略数
+     * 
+     * @return
+     */
+    public int size() {
+        return stgs.size();
     }
 
     /**
@@ -74,7 +89,7 @@ public class ScopeStrategies extends Director {
      * 
      */
     public Iterator<Strategy> iterator() {
-        return strategies.values().iterator();
+        return stgs.values().iterator();
     }
 
 }

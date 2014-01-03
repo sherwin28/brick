@@ -8,15 +8,18 @@ public class TestService extends BaseService {
     public void test() {
         PluginCommand cmd = PluginCommand.getAction();
 
-        System.out.println("TestService: " + cmd.getParameter("test"));
+        System.out.println("TestService.test(): " + cmd.getParameter("test"));
 
         toPersist();
-        System.out.println(cmd.getResult());
+        System.out.println("TestService.test(): " + cmd.getResult());
 
-        cmd.setOperate("Chain");
         cmd.setDirect("chain");
         toPersist();
-        System.out.println(cmd.getResult());
+        System.out.println("TestService.test(): " + cmd.getResult());
+
+        cmd.setTarget("chain");
+        toPersist();
+        System.out.println("TestService.test(): " + cmd.getResult());
     }
 
 }

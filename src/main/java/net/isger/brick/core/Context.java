@@ -21,79 +21,82 @@ public class Context {
 
     public static final String STUB = "stub";
 
-    private static final ThreadLocal<Context> actionContext;
+    private static final ThreadLocal<Context> CONTEXT;
 
-    private Map<String, Object> context;
+    private Map<String, Object> contextMap;
 
     static {
-        actionContext = new ThreadLocal<Context>();
+        CONTEXT = new ThreadLocal<Context>();
     }
 
     public Context() {
-        this(null);
+        this.contextMap = new HashMap<String, Object>();
     }
 
     public Context(Map<String, Object> context) {
-        this.context = new HashMap<String, Object>();
+        this();
         if (context != null) {
-            this.context.putAll(context);
+            this.contextMap.putAll(context);
         }
-    }
-
-    public static Context getActionContext() {
-        return actionContext.get();
-    }
-
-    public static void setContext(Context context) {
-        actionContext.set(context);
     }
 
     Map<String, Object> getContextMap() {
-        return context;
+        return contextMap;
     }
 
     public Object get(String key) {
-        return context.get(key);
+        return contextMap.get(key);
     }
 
     public Object set(String key, Object value) {
-        return context.put(key, value);
+        return contextMap.put(key, value);
     }
 
-    public Command getCommand() {
-        return (Command) get(COMMAND);
+    public static Context getActionContext() {
+        return CONTEXT.get();
     }
 
-    public Module getModule() {
-        return (Module) get(MODULE);
+    public static void setActionContext(Context context) {
+        CONTEXT.set(context);
     }
 
-    public Plugin getPlugin() {
-        return (Plugin) get(PLUGIN);
+    public static Object getAction(String key) {
+        Context context = getActionContext();
+        if (context == null) {
+            return null;
+        }
+        return context.get(key);
+    }
+
+    public static void setAction(String key, Object value) {
+        Context context = getActionContext();
+        if (context != null) {
+            context.set(key, value);
+        }
     }
 
     public static Command getActionCommand() {
-        Context context = getActionContext();
-        if (context == null) {
-            return null;
-        }
-        return context.getCommand();
+        return (Command) getAction(COMMAND);
+    }
+
+    public static void setActionCommand(Command command) {
+        setAction(COMMAND, command);
     }
 
     public static Module getActionModule() {
-        Context context = getActionContext();
-        if (context == null) {
-            return null;
-        }
-        return context.getModule();
+        return (Module) getAction(MODULE);
+    }
+
+    public static void setActionModule(Module module) {
+        setAction(MODULE, module);
     }
 
     public static Plugin getActionPlugin() {
-        Context context = getActionContext();
-        if (context == null) {
-            return null;
-        }
-        return context.getPlugin();
+        return (Plugin) getAction(PLUGIN);
+    }
+
+    public static void setActionPlugin(Plugin plugin) {
+        setAction(PLUGIN, plugin);
     }
 
 }

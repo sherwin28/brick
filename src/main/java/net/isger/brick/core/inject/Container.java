@@ -1,5 +1,11 @@
 package net.isger.brick.core.inject;
 
+/**
+ * 容器
+ * 
+ * @author issing
+ * 
+ */
 public interface Container {
 
     public static final String DEFAULT_NAME = "default";

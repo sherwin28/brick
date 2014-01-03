@@ -15,7 +15,7 @@ public class BrickConfigProvider implements ContainerProvider {
     }
 
     public void register(ContainerBuilder builder) {
-        builder.factory(Console.class, DefaultConsole.class, Scope.STRATEGY)
+        builder.factory(Console.class, DefaultConsole.class, Scope.SINGLETON)
                 .factory(Preparers.class, Scope.SINGLETON)
                 .factory(Modules.class, Scope.SINGLETON);
     }

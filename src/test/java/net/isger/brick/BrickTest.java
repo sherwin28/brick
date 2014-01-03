@@ -21,29 +21,28 @@ public class BrickTest extends TestCase {
     }
 
     public void testBrick() {
+        // 初始环境
+        ConsoleManager manager = new ConsoleManager();
+        Console console = manager.getConsole();
+        Context context = new Context();
+        Context.setActionContext(context);
+
+        // 调用插件
         PluginCommand pcmd = new PluginCommand();
         pcmd.setDomain("test");
         pcmd.setDirect("test");
         pcmd.setTarget("test");
         pcmd.setParameter("test", "this is test.");
-        ConsoleManager manager = new ConsoleManager();
-        Console console = manager.getConsole();
-        Context context = new Context();
-        context.set(Context.COMMAND, pcmd);
-        Context.setContext(context);
-        console.execute();
-        // OldConsole.execute(pcmd);
+        console.execute(pcmd);
+
+        // 调用存根
         StubCommand scmd = StubCommand.cast(pcmd);
-        TestBean bean = new TestBean();
-        bean.setId("test");
-        bean.setName("hello");
-        scmd.setTable(bean);
-        // scmd.setOperate(StubCommand.OPERATE_INSERT);
-        // Console.execute(scmd);
+        scmd.setTable(new TestBean("test", "this is test."));
         scmd.setOperate(StubCommand.OPERATE_SEARCH);
-        // Object[] result = (Object[]) Console.execute(scmd);
-        context.set(Context.COMMAND, scmd);
+        Context.setActionCommand(scmd);
         console.execute();
+
+        // 显示结果
         Object[] result = (Object[]) scmd.getResult();
         System.out.println("======================================");
         for (Object name : (Object[]) result[0]) {
@@ -57,6 +56,7 @@ public class BrickTest extends TestCase {
             }
             System.out.println();
         }
+
         assertTrue(true);
     }
 

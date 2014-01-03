@@ -9,6 +9,12 @@ import net.isger.brick.core.ConsoleManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * 容器实例供应集合
+ * 
+ * @author issing
+ * 
+ */
 public class ContainerProviders implements Iterable<ContainerProvider> {
 
     private static final Logger LOG;
@@ -28,7 +34,7 @@ public class ContainerProviders implements Iterable<ContainerProvider> {
             if (provider.isReload()) {
                 if (LOG.isInfoEnabled()) {
                     LOG.info(
-                            "Detected module provider [#0] needs to be reloaded. Reloading all providers.",
+                            "Detected module provider [{}] needs to be reloaded. Reloading all providers.",
                             provider.toString());
                 }
                 return true;

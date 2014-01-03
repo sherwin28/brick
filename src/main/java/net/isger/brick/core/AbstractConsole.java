@@ -8,9 +8,6 @@ import net.isger.brick.BrickConstants;
 import net.isger.brick.BrickException;
 import net.isger.brick.core.inject.Container;
 import net.isger.brick.core.preparer.Preparers;
-import net.isger.brick.raw.Artifact;
-import net.isger.brick.raw.Depository;
-import net.isger.brick.raw.Depot;
 import net.isger.brick.util.anno.Alias;
 import net.isger.brick.util.anno.Ignore;
 
@@ -31,10 +28,10 @@ public abstract class AbstractConsole implements Console {
     private transient boolean initialized;
 
     @Alias(BrickConstants.KEY_BRICK_NAME)
-    private String name;
+    protected String name;
 
     @Alias(BrickConstants.KEY_BRICK_CONTAINER)
-    private Container container;
+    protected Container container;
 
     static {
         LOG = LoggerFactory.getLogger(AbstractConsole.class);
@@ -50,13 +47,8 @@ public abstract class AbstractConsole implements Console {
             return;
         }
         initialized = true;
-        String path = name + ".json";
         // 加载应用配置
-        Artifact artifact = Depository.wrap("json", Depot.LAB_FILE, path);
-        if (artifact == null) {
-            throw new BrickException("Not found the config by " + path);
-        }
-        Object res = artifact.use("transform");
+        Object res = load();
         if (res instanceof Collection) {
             load((Collection<?>) res);
         } else if (res instanceof Map) {
@@ -64,8 +56,7 @@ public abstract class AbstractConsole implements Console {
         } else {
             throw new BrickException("Unexpected load the modules by " + res);
         }
-        Modules modules = container.getInstance(Modules.class);
-        modules.initial();
+        container.getInstance(Modules.class).initial();
     }
 
     public Container getContainer() {
@@ -75,20 +66,20 @@ public abstract class AbstractConsole implements Console {
     /**
      * 加载资源
      * 
+     * @return
+     */
+    protected abstract Object load();
+
+    /**
+     * 加载资源
+     * 
      * @param res
      */
     @SuppressWarnings("unchecked")
-    private void load(Collection<?> res) {
-        Artifact artifact;
+    protected void load(Collection<?> res) {
         for (Object config : res) {
             if (config instanceof String) {
-                artifact = Depository.wrap("json", Depot.LAB_FILE,
-                        (String) config);
-                if (artifact == null) {
-                    throw new BrickException("Not found the config by "
-                            + config);
-                }
-                config = artifact.use("transform");
+                config = load((String) config);
             }
             if (!(config instanceof Map)) {
                 throw new BrickException(
@@ -99,11 +90,19 @@ public abstract class AbstractConsole implements Console {
     }
 
     /**
+     * 加载资源
+     * 
+     * @param res
+     * @return
+     */
+    protected abstract Object load(String res);
+
+    /**
      * 加载配置
      * 
      * @param res
      */
-    private void load(Map<String, Object> res) {
+    protected void load(Map<String, Object> res) {
         Modules modules = container.getInstance(Modules.class);
         Module module;
         String name;
@@ -119,24 +118,28 @@ public abstract class AbstractConsole implements Console {
     }
 
     public void execute() {
-        initial();
+        Command cmd = Context.getActionCommand();
         Preparers prepares = container.getInstance(Preparers.class);
         prepares.prepare();
-        Context context = Context.getActionContext();
-        Command cmd = context.getCommand();
-        String name = Commands.getModuleName(cmd);
-        if (name == null) {
+        String moduleName = Commands.getModuleName(cmd);
+        if (moduleName == null) {
             operate();
         } else {
-            Modules modules = container.getInstance(Modules.class);
-            Module module = modules.get(name);
+            Module module = container.getInstance(Modules.class)
+                    .get(moduleName);
             if (module == null) {
-                throw new BrickException("Not found the module by " + name);
+                throw new BrickException("Not found the module by "
+                        + moduleName);
             }
-            context.set(Context.MODULE, module);
+            Context.setActionModule(module);
             module.execute();
         }
         prepares.cleanup();
+    }
+
+    public void execute(Command cmd) {
+        Context.setActionCommand(cmd);
+        execute();
     }
 
     /**
@@ -150,6 +153,7 @@ public abstract class AbstractConsole implements Console {
             return;
         }
         initialized = false;
+        container.getInstance(Modules.class).destroy();
     }
 
 }

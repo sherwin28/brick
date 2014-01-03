@@ -8,7 +8,7 @@ public class ChainPersist extends BasePersist {
     public void test() {
         PluginCommand cmd = PluginCommand.getAction();
 
-        System.out.println("TestChainPersist(test): "
+        System.out.println("TestChainPersist.test(): "
                 + cmd.getParameter("test"));
 
         cmd.setResult("ChainPersist.test.result");
@@ -17,7 +17,7 @@ public class ChainPersist extends BasePersist {
     public void chain() {
         PluginCommand cmd = PluginCommand.getAction();
 
-        System.out.println("TestChainPersist(chain): "
+        System.out.println("TestChainPersist.chain(): "
                 + cmd.getParameter("test"));
 
         cmd.setResult("ChainPersist.chain.result");

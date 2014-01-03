@@ -8,7 +8,7 @@ public class TestPersist extends BasePersist {
     public void test() {
         PluginCommand cmd = PluginCommand.getAction();
 
-        System.out.println("TestPersist: " + cmd.getParameter("test"));
+        System.out.println("TestPersist.test(): " + cmd.getParameter("test"));
 
         cmd.setResult("TestPersist.test.result");
     }

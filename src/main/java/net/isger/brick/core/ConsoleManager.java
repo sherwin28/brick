@@ -1,7 +1,6 @@
 package net.isger.brick.core;
 
 import java.util.Iterator;
-import java.util.concurrent.Callable;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -12,9 +11,6 @@ import net.isger.brick.core.inject.Container;
 import net.isger.brick.core.inject.ContainerBuilder;
 import net.isger.brick.core.inject.ContainerProvider;
 import net.isger.brick.core.inject.ContainerProviders;
-import net.isger.brick.core.inject.Strategy;
-import net.isger.brick.util.Reflects;
-import net.isger.brick.util.reflect.BoundField;
 
 /**
  * 控制台管理器
@@ -56,20 +52,7 @@ public class ConsoleManager {
     public final synchronized Console getConsole() {
         if (console == null) {
             // 创建容器并初始化
-            final Container container = createContainer(getContainerProviders());
-            container.setStrategy(Console.class, new Strategy() {
-                public <T> T find(Class<T> type, String name,
-                        Callable<? extends T> factory) throws Exception {
-                    T result = factory.call();
-                    BoundField field = Reflects.getBoundField(
-                            result.getClass(),
-                            BrickConstants.KEY_BRICK_CONTAINER);
-                    if (field != null) {
-                        field.setValue(result, container);
-                    }
-                    return result;
-                }
-            });
+            Container container = createContainer(getContainerProviders());
             container.initial();
             // 获取控制台实例并初始化
             console = container.getInstance(Console.class);

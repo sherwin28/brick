@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.isger.brick.BrickException;
+import net.isger.brick.util.Reflects;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,7 @@ public final class ContainerBuilder {
 
     private final Map<Key<?>, InternalFactory<?>> facs;
 
-    private boolean duplicates;
+    private boolean duplicated;
 
     static {
         LOG = LoggerFactory.getLogger(ContainerBuilder.class);
@@ -28,7 +29,7 @@ public final class ContainerBuilder {
 
     public ContainerBuilder() {
         this.facs = new HashMap<Key<?>, InternalFactory<?>>();
-        this.duplicates = false;
+        this.duplicated = false;
     }
 
     public <T> ContainerBuilder factory(Class<T> type) {
@@ -68,7 +69,9 @@ public final class ContainerBuilder {
             final Class<? extends T> implementation, Scope scope) {
         return factory(Key.newInstance(type, name), new InternalFactory<T>() {
             public T create(InternalContext context) {
-                return context.container.inject(implementation);
+                T result = Reflects.newInstance(implementation);
+                context.container.inject(result);
+                return result;
             }
         }, scope);
     }
@@ -89,7 +92,7 @@ public final class ContainerBuilder {
     private <T> ContainerBuilder factory(final Key<T> key,
             InternalFactory<? extends T> factory, Scope scope) {
         if (facs.containsKey(key)) {
-            if (!duplicates) {
+            if (!duplicated) {
                 throw new BrickException("Dependency mapping for " + key
                         + " already exists");
             }
@@ -102,7 +105,7 @@ public final class ContainerBuilder {
     }
 
     public void setDuplicates(boolean duplicates) {
-        this.duplicates = duplicates;
+        this.duplicated = duplicates;
     }
 
     public Container create() {

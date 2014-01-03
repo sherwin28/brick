@@ -27,12 +27,12 @@ public class BaseService extends DynamicTarget implements Service {
     }
 
     protected void toService(PluginCommand cmd) {
-        cmd.setDirect(PluginCommand.OPERATE_SERVICE);
+        cmd.setOperate(PluginCommand.OPERATE_SERVICE);
         ((PluginModule) Context.getActionModule()).call(cmd);
     }
 
     protected void toPersist(PluginCommand cmd) {
-        cmd.setDirect(PluginCommand.OPERATE_PERSIST);
+        cmd.setOperate(PluginCommand.OPERATE_PERSIST);
         ((PluginModule) Context.getActionModule()).call(cmd);
     }
 

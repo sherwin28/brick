@@ -8,8 +8,6 @@ package net.isger.brick;
  */
 public interface BrickConstants {
 
-    public static final String KEY_BRICK_CONSOLEMANAGER = "brick.consoleManager";
-
     public static final String KEY_BRICK_NAME = "brick.name";
 
     public static final String BRICK = "brick";

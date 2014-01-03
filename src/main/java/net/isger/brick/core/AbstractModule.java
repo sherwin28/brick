@@ -6,7 +6,6 @@ public abstract class AbstractModule implements Module {
 
     protected Loader loader;
 
-    /** TODO 注入存在缺陷 */
     protected Operaters operaters;
 
     protected AbstractModule() {

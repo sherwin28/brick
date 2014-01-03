@@ -1,21 +1,29 @@
 package net.isger.brick.core.inject;
 
+import java.util.HashMap;
 import java.util.Map;
 
+import net.isger.brick.BrickConstants;
 import net.isger.brick.util.Reflects;
 import net.isger.brick.util.reflect.BoundField;
 
+/**
+ * 内部容器
+ * 
+ * @author issing
+ * 
+ */
 class InternalContainer implements Container {
 
-    final Map<Key<?>, InternalFactory<?>> factories;
+    final Map<Key<?>, InternalFactory<?>> facs;
 
-    final ScopeStrategies strategies;
+    final ScopeStrategies stgs;
 
     private ThreadLocal<Object[]> context;
 
     InternalContainer(Map<Key<?>, InternalFactory<?>> factories) {
-        this.factories = factories;
-        this.strategies = new ScopeStrategies();
+        this.facs = new HashMap<Key<?>, InternalFactory<?>>(factories);
+        this.stgs = new ScopeStrategies();
         this.context = new ThreadLocal<Object[]>() {
             protected Object[] initialValue() {
                 return new Object[1];
@@ -24,20 +32,22 @@ class InternalContainer implements Container {
     }
 
     public void initial() {
+        final Container container = this;
+        this.facs.put(Key.newInstance(Container.class,
+                BrickConstants.KEY_BRICK_CONTAINER),
+                new InternalFactory<Container>() {
+                    public Container create(InternalContext context) {
+                        return container;
+                    }
+                });
     }
 
     public void setStrategy(Class<?> type, Strategy strategy) {
-        strategies.add(type, DEFAULT_NAME, strategy);
+        stgs.add(type, DEFAULT_NAME, strategy);
     }
 
     public void setStrategy(Class<?> type, String name, Strategy strategy) {
-        strategies.add(type, name, strategy);
-    }
-
-    <T> T inject(Class<? extends T> implementation) {
-        T instance = Reflects.newInstance(implementation);
-        inject(instance);
-        return instance;
+        stgs.add(type, name, strategy);
     }
 
     public void inject(final Object instance) {
@@ -73,6 +83,12 @@ class InternalContainer implements Container {
         });
     }
 
+    /**
+     * 上下文传递
+     * 
+     * @param callable
+     * @return
+     */
     private <T> T call(ContextualCallable<T> callable) {
         Object[] reference = context.get();
         if (reference[0] == null) {
@@ -95,20 +111,9 @@ class InternalContainer implements Container {
     @SuppressWarnings("unchecked")
     private <T> T getInstance(Class<T> type, String name,
             InternalContext context) {
-        ExternalContext<?> previous = context.getExternalContext();
-        Key<T> key = Key.newInstance(type, name);
-        context.setExternalContext(ExternalContext.newInstance(null, key, this));
-        try {
-            InternalFactory<? extends T> factory = (InternalFactory<? extends T>) factories
-                    .get(key);
-            if (factory != null) {
-                return factory.create(context);
-            } else {
-                return null;
-            }
-        } finally {
-            context.setExternalContext(previous);
-        }
+        InternalFactory<? extends T> factory = (InternalFactory<? extends T>) facs
+                .get(Key.newInstance(type, name));
+        return factory == null ? null : factory.create(context);
     }
 
     public void destroy() {

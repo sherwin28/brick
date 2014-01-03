@@ -1,6 +1,14 @@
 package net.isger.brick.core.inject;
 
+/**
+ * 键
+ * 
+ * @author issing
+ * @param <T>
+ */
 public class Key<T> {
+
+    private static final String FORMAT_KEY = "{type : \"%s\", name : \"%s\"}";
 
     final Class<T> type;
 
@@ -9,15 +17,12 @@ public class Key<T> {
     final int hashCode;
 
     private Key(Class<T> type, String name) {
-        if (type == null) {
-            throw new NullPointerException("Type is null");
-        }
-        if (name == null) {
-            throw new NullPointerException("Name is null");
+        if (type == null || name == null) {
+            throw new NullPointerException("Invalid parameter");
         }
         this.type = type;
         this.name = name;
-        hashCode = type.hashCode() * 31 + name.hashCode();
+        this.hashCode = type.hashCode() * 31 + name.hashCode();
     }
 
     public static <T> Key<T> newInstance(Class<T> type, String name) {
@@ -39,16 +44,15 @@ public class Key<T> {
     public boolean equals(Object o) {
         if (!(o instanceof Key)) {
             return false;
-        }
-        if (o == this) {
+        } else if (o == this) {
             return true;
         }
-        Key<?> other = (Key<?>) o;
-        return name.equals(other.name) && type.equals(other.type);
+        Key<?> key = (Key<?>) o;
+        return name.equals(key.name) && type.equals(key.type);
     }
 
     public String toString() {
-        return "[type=" + type.getName() + ", name='" + name + "']";
+        return String.format(FORMAT_KEY, type.getName(), name);
     }
 
 }
