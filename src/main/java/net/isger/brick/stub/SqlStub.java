@@ -170,7 +170,6 @@ public class SqlStub extends AbstractStub {
                 sql = Sqls.getSQL((Class<?>) table, condition.getTarget(),
                         condition.getArgments());
                 values = (Object[]) condition.getValues();
-
             } else {
                 SQLEntry entry = Sqls.getQueryEntry(table);
                 sql = entry.getSQL();
@@ -203,8 +202,10 @@ public class SqlStub extends AbstractStub {
     private Object search(Connection conn, String sql, Object[] values,
             Page page, Sort sort) {
         Object[] result = null;
-        sql = dialect.makeSortSQL(sql, sort);
-        if (page == null) {
+        if (sort != null && sort.getName() != null && sort.getOrder() != null) {
+            sql = dialect.makeSortSQL(sql, sort);
+        }
+        if (page == null || page.getStart() == null || page.getLimit() == null) {
             result = Sqls.query(sql, values, conn);
         } else {
             PageSQL pageSQL = dialect.makePageSQL(sql, values, page);

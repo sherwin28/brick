@@ -12,7 +12,7 @@ public class MySQLDialect extends AbstractDialect {
             final Page page) {
         return new PageSQL() {
             public String getWrapSQL() {
-                return "select * from (" + sql + ") t limit ?, ?";
+                return sql + " limit ?, ?";
             }
 
             public Object[] getWrapValues() {
